@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "export:web": "expo export --platform web --output-dir dist",
-    "deploy": "npm run export:web && gh-pages -d dist"
+    "deploy": "npm run export:web && gh-pages --nojekyll -d dist"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
