@@ -55,6 +55,7 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [busyText, setBusyText] = useState('Loading...');
   const [chatOpen, setChatOpen] = useState(false);
+  const isWeb = Platform.OS === 'web';
 
   const me = store.profiles.find((p) => p.email === store.currentUserEmail) ?? null;
   const friendsEmails = useMemo(() => {
@@ -116,6 +117,43 @@ export default function App() {
   const patchStore = (updater: (current: Store) => Store) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setStore((current) => updater(current));
+  };
+
+  const renderIcon = (
+    name: 'info' | 'chat' | 'logout' | 'bell' | 'back' | 'send',
+    color: string,
+    size: number
+  ) => {
+    if (!isWeb) {
+      const iconName =
+        name === 'info'
+          ? 'information-circle-outline'
+          : name === 'chat'
+            ? 'chatbubble-ellipses-outline'
+            : name === 'logout'
+              ? 'log-out-outline'
+              : name === 'bell'
+                ? 'notifications'
+                : name === 'back'
+                  ? 'arrow-back'
+                  : 'send';
+      return <Ionicons name={iconName} size={size} color={color} />;
+    }
+
+    const glyph =
+      name === 'info'
+        ? 'i'
+        : name === 'chat'
+          ? '...'
+          : name === 'logout'
+            ? '->'
+            : name === 'bell'
+              ? '!'
+              : name === 'back'
+                ? '<'
+                : '>';
+
+    return <Text style={[styles.webIconGlyph, { color, fontSize: size }]}>{glyph}</Text>;
   };
 
   const smoothAction = (text: string, action: () => void) => {
@@ -339,7 +377,8 @@ export default function App() {
 
   function authView() {
     return (
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.pageScroll}>
+        <View style={styles.pageShell}>
         <View style={styles.brandWrap}>
           <LinearGradient colors={['#1574FF', '#2AEF74']} style={styles.brandMark}>
             <Text style={styles.brandMarkText}>ZO</Text>
@@ -348,7 +387,7 @@ export default function App() {
           <Text style={styles.brandSubtitle}>Dynamic Messaging</Text>
         </View>
         <View style={styles.noticeBox}>
-          <Ionicons name="information-circle-outline" size={18} color="#54656f" />
+          {renderIcon('info', '#54656f', 18)}
           <Text style={styles.notice}>{notice}</Text>
         </View>
 
@@ -416,6 +455,7 @@ export default function App() {
             ))}
           </View>
         ) : null}
+        </View>
       </ScrollView>
     );
   }
@@ -427,6 +467,7 @@ export default function App() {
 
     return (
       <View style={styles.screen}>
+        <View style={styles.pageShell}>
         <View style={styles.header}>
           <View>
             <View style={styles.headerBrandRow}>
@@ -438,16 +479,16 @@ export default function App() {
             <Text style={styles.headerSub}>{me.name}</Text>
           </View>
           <Pressable onPress={logout} style={styles.iconBtn}>
-            <Ionicons name="log-out-outline" size={18} color="#54656f" />
+            {renderIcon('logout', '#54656f', 18)}
           </Pressable>
         </View>
         <View style={styles.noticeBox}>
-          <Ionicons name="chatbubble-ellipses-outline" size={18} color="#54656f" />
+          {renderIcon('chat', '#54656f', 18)}
           <Text style={styles.notice}>{notice}</Text>
         </View>
         {totalUnread > 0 ? (
           <View style={styles.popupCard}>
-            <Ionicons name="notifications" size={18} color="#fff" />
+            {renderIcon('bell', '#fff', 18)}
             <Text style={styles.popupText}>
               {totalUnread} unread {totalUnread === 1 ? 'message' : 'messages'}
             </Text>
@@ -465,6 +506,7 @@ export default function App() {
           {tab === 'Friends' ? friendsTab() : null}
           {tab === 'Settings' ? settingsTab() : null}
         </ScrollView>
+        </View>
       </View>
     );
   }
@@ -479,7 +521,7 @@ export default function App() {
         <>
           <View style={styles.chatScreenHeader}>
             <Pressable onPress={() => setChatOpen(false)} style={styles.backBtn}>
-              <Ionicons name="arrow-back" size={20} color="#111b21" />
+              {renderIcon('back', '#111b21', 20)}
             </Pressable>
             <LinearGradient colors={activeFriend.accent} style={styles.smallAvatar}>
               <Text style={styles.smallAvatarText}>{activeFriend.name.charAt(0).toUpperCase()}</Text>
@@ -506,7 +548,7 @@ export default function App() {
             <View style={styles.composer}>
               <TextInput value={draft} onChangeText={setDraft} placeholder={`Message ${activeFriend.name}`} placeholderTextColor="#8c9aa5" style={styles.composerInput} />
               <Pressable onPress={sendMessage} style={styles.sendBtn}>
-                <Ionicons name="send" size={18} color="#fff" />
+                {renderIcon('send', '#fff', 18)}
               </Pressable>
             </View>
           </View>
@@ -650,18 +692,21 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f6f7f8' },
   loading: { fontSize: 18, fontWeight: '700', color: '#111b21' },
+  pageScroll: { padding: 18, paddingBottom: 32 },
+  pageShell: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
   loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(17,27,33,0.18)', alignItems: 'center', justifyContent: 'center', padding: 24 },
   loadingCard: { backgroundColor: '#fff', borderRadius: 24, paddingHorizontal: 28, paddingVertical: 24, alignItems: 'center', minWidth: 180 },
   loadingCardText: { marginTop: 14, color: '#111b21', fontWeight: '700', fontSize: 15 },
-  content: { padding: 18, paddingBottom: 32 },
+  content: { paddingBottom: 32 },
+  webIconGlyph: { fontWeight: '800', lineHeight: 20, textAlign: 'center', minWidth: 18 },
   brandWrap: { alignItems: 'center', justifyContent: 'center', paddingVertical: 10, marginBottom: 10 },
   brandMark: { width: 120, height: 120, borderRadius: 34, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   brandMarkText: { color: '#fff', fontSize: 42, fontWeight: '800', letterSpacing: 1 },
   brandTitle: { color: '#0d4aa5', fontSize: 34, fontWeight: '800' },
   brandSubtitle: { color: '#6f8798', fontSize: 16, letterSpacing: 1.4, marginTop: 4, textTransform: 'uppercase' },
-  noticeBox: { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: 18, marginBottom: 14, backgroundColor: '#fff', borderRadius: 18, padding: 14 },
+  noticeBox: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14, backgroundColor: '#fff', borderRadius: 18, padding: 14 },
   notice: { flex: 1, color: '#54656f', fontSize: 13, lineHeight: 19 },
-  popupCard: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-end', marginHorizontal: 18, marginBottom: 14, backgroundColor: '#111b21', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 12 },
+  popupCard: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-end', marginBottom: 14, backgroundColor: '#111b21', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 12 },
   popupText: { color: '#fff', fontWeight: '700' },
   card: { backgroundColor: '#fff', borderRadius: 24, padding: 16, marginBottom: 16 },
   cardTitle: { color: '#111b21', fontSize: 20, fontWeight: '800', marginBottom: 12 },
@@ -680,14 +725,14 @@ const styles = StyleSheet.create({
   flex1: { flex: 1 },
   rowTitle: { color: '#111b21', fontSize: 15, fontWeight: '700' },
   rowSub: { color: '#667781', marginTop: 2 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 18, paddingTop: 8, paddingBottom: 10 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, paddingBottom: 10 },
   headerBrandRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   headerLogo: { width: 34, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   headerLogoText: { color: '#fff', fontSize: 14, fontWeight: '800' },
   headerTitle: { color: '#111b21', fontSize: 26, fontWeight: '800' },
   headerSub: { color: '#667781', marginTop: 2 },
   iconBtn: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
-  tabs: { flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingBottom: 12 },
+  tabs: { flexDirection: 'row', gap: 10, paddingBottom: 12 },
   tab: { flex: 1, backgroundColor: '#dfe5e7', borderRadius: 16, paddingVertical: 12, alignItems: 'center' },
   tabActive: { backgroundColor: '#25D366' },
   tabLabel: { color: '#54656f', fontWeight: '700' },
