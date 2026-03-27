@@ -2,6 +2,8 @@
 
 Zorachat is a mobile-first chat app prototype built with Expo and React Native.
 
+Live demo: https://tirthpatel-au.github.io/zorachat-app/
+
 It includes:
 
 - account creation and login by email
@@ -41,6 +43,12 @@ npm install
 npm start
 ```
 
+For a production-style web build:
+
+```bash
+npm run export:web
+```
+
 4. Open the app:
 
 - On phone: scan the QR code in Expo Go
@@ -69,6 +77,8 @@ npm start
 npm run android
 npm run ios
 npm run web
+npm run export:web
+npm run deploy
 ```
 
 ## Notes
