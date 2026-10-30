@@ -32,6 +32,13 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
+.env.*
+
+# local shared backend data and logs
+data/*.json
+!data/store.example.json
+*.log
 
 # typescript
 *.tsbuildinfo

@@ -1,9 +1,10 @@
 {
-  "name": "pulse-chat",
+  "name": "velora",
   "version": "1.0.0",
   "main": "index.ts",
-  "homepage": "https://tirthpatel-au.github.io/zorachat-app/",
+  "homepage": "https://tirthpatel-au.github.io/velora-app/",
   "scripts": {
+    "server": "node server.js",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",

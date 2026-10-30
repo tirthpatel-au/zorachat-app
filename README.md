@@ -1,13 +1,13 @@
-# Zorachat
+# Velora
 
-Zorachat is a mobile-first chat app prototype built with Expo and React Native.
+Velora is a mobile-first chat app built with Expo and React Native.
 
-Live demo: https://tirthpatel-au.github.io/zorachat-app/
+Live demo: https://tirthpatel-au.github.io/velora-app/
 
 It includes:
 
-- account creation and login by email
-- local multi-user testing on one device
+- account creation and login by email and password
+- shared local backend for multi-device testing
 - friend search by exact email
 - friend request sending and accepting
 - one-to-one chat threads
@@ -20,7 +20,7 @@ It includes:
 - Expo SDK 54
 - React Native
 - TypeScript
-- AsyncStorage for local persistence
+- Node HTTP server with a JSON database for shared local persistence
 
 ## Run Locally
 
@@ -37,7 +37,13 @@ cd zorachat-app
 npm install
 ```
 
-3. Start the Expo server:
+3. Start the shared backend in one terminal:
+
+```bash
+npm run server
+```
+
+4. Start the Expo server in another terminal:
 
 ```bash
 npm start
@@ -49,7 +55,7 @@ For a production-style web build:
 npm run export:web
 ```
 
-4. Open the app:
+5. Open the app:
 
 - On phone: scan the QR code in Expo Go
 - On desktop web: press `w` in the Expo terminal or run `npm run web`
@@ -79,13 +85,16 @@ npm run ios
 npm run web
 npm run export:web
 npm run deploy
+npm run server
 ```
 
 ## Notes
 
-- App data is stored locally on device using AsyncStorage
-- `Reset All Local Data` removes all saved accounts, requests, and chats
-- The current in-app branding is Zorachat
+- The shared backend stores runtime data in `data/store.json`, which is intentionally ignored by Git because it can contain test passwords and account data.
+- `data/store.example.json` documents the database shape without including credentials.
+- Web uses `http://localhost:3100` by default. Android emulator uses `http://10.0.2.2:3100`.
+- For Expo Go on a real phone, set `EXPO_PUBLIC_API_URL` to your computer's LAN address before starting Expo, for example `EXPO_PUBLIC_API_URL=http://192.168.1.20:3100 npm start`.
+- The current in-app branding is Velora.
 
 ## License
 
